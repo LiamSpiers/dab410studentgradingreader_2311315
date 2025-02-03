@@ -96,7 +96,7 @@ button6.pack(pady=10)
 button7 = tk.Button(window, text="Number of Cs", command=lambda: show_result("Number of Cs"))
 button7.pack(pady=10)
 
-# This creates a label to display the result
+# This creates a label to display the results
 result_label = tk.Label(window, text="", font=("Helvetica", 12), wraplength=300)
 result_label.pack(pady=20)
 
