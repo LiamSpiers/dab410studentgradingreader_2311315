@@ -1,29 +1,27 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
-# Read the CSV file and create a DataFrame
+# This reads the CSV file and turns it into a DataFrame
 file_path = 'student_grades.csv'
 
+#This allows the program to inform user and exit gracefully without crashing if CSV file is missing or the path is incorrect
+#This will also inform the user how to use the program with instructions
 try:
     df = pd.read_csv(file_path)
 except FileNotFoundError:
     print("Error: CSV file not found.")
-    print("Ensure the file is named 'student_grades.csv' and is in the same directory as this script.")
+    print( "Please make sure your CSV file is named 'student_grades.csv' and is located in the same directory as this script.")
     exit()
 
-# his will check the actual column names in the CSV
-df.columns = df.columns.str.strip()  # Debugging - Strips any accidental spaces around column names so you are able to find student just by first or last name
-print(f"Column names in the CSV: {list(df.columns)}")  # Debugging - This verifies the column names
 
-# This verifies if the 'grade' and 'attendance' columns exist
+# This verifies if grade and attendance columns exist, informs user reason for error
 if 'grade' not in df.columns or 'attendance' not in df.columns:
     print("Error: CSV file must include 'grade' and 'attendance' columns.")
     exit()
 
-# This combines the first and last name into a full name column and strips spaces
+# This combines first and last name into a full name column and strip feature to strip any extra spaces so user can search for just first or last name.
 df['name'] = (df['first_name'].str.strip() + ' ' + df['last_name'].str.strip())
 
-# This displays the entire DataFrame
-print(df.to_string())
 
 # This calculates the average student grade
 average_grade = df['grade'].mean()
@@ -45,7 +43,7 @@ number_of_As = len(df[df['grade'] >= 70])
 number_of_Bs = len(df[(df['grade'] >= 50) & (df['grade'] < 70)])
 number_of_Cs = len(df[(df['grade'] >= 40) & (df['grade'] < 50)])
 
-# This is how it will display the  results
+# This prints results in the terminal in a clear way for the user
 print(f"\nThe average student grade is: {average_grade}")
 print(f"The average student attendance is: {average_attendance}")
 print(f"The number of students who failed (grade below 40) is: {number_of_fails}")
@@ -54,18 +52,35 @@ print(f"The number of students with grade A (70 and above) is: {number_of_As}")
 print(f"The number of students with grade B (50-69) is: {number_of_Bs}")
 print(f"The number of students with grade C (40-49) is: {number_of_Cs}")
 
+    # This groups by 'country' and calculates the average grade for each country
+average_grade_by_country = df.groupby('country')['grade'].mean().sort_values(ascending=False)
 
-# This is the Search Feature with will include partial matching to help user experience
+# This limits the number of countries to the top 10 so the graph is not too overcrowded and unreadable
+top_n = 10
+average_grade_by_country = average_grade_by_country.head(top_n)
+
+# This creates a bar chart that shows the average grades by country
+def plot_average_grade_by_country():
+    plt.figure(figsize=(10, 6))
+    average_grade_by_country.plot(kind='bar', color='skyblue')
+
+    plt.title(f"Top {top_n} Countries by Average Student Grade", fontsize=14)
+    plt.xlabel("Country", fontsize=12)
+    plt.ylabel("Average Grade", fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+# This displays the graph
+plot_average_grade_by_country()
+
+# This is the search function for individual student
 def search_student(name):
     try:
-        # This strips any extra spaces from the search input and make it case-insensitive
         name = name.strip().lower()
-
-        # This will attempt exact matching first
         student_info = df[df['name'].str.lower() == name]
 
         if student_info.empty:
-            # If no exact match, try partial matching (contains)
             student_info = df[df['name'].str.lower().str.contains(name)]
 
         if not student_info.empty:
@@ -79,9 +94,7 @@ def search_student(name):
     except Exception as e:
         print(f"An error occurred while searching: {e}")
 
-
-# This will promt the user for student name to search if they wanted
-# This will inform user how to use the program and how to exit
+# This is a loop to allow search and display results
 while True:
     search_name = input("\nEnter a student's name to view their grade and attendance (or type 'exit' to quit): ")
     if search_name.lower() == 'exit':
