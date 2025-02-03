@@ -42,6 +42,8 @@ window.title("Student Grade Reader")
 
 # This function is used to display the selected result
 def show_result(choice):
+    # Debugging - this confirms the function is being run
+    print(f"Button clicked: {choice}")
 
     # This checks which option was clicked and then displays the correct result
     if choice == "Average Grade":
@@ -59,6 +61,8 @@ def show_result(choice):
     elif choice == "Number of Cs":
         result = f"The number of students with grade C (40-49) is: {number_of_Cs}"
 
+    # Debugging - Was unable to get the buttons to provide results, This prints the result before updating the label
+    print(f"Result to display: {result}")
 
     # This clears the label text before updating it
     result_label.config(text="")
